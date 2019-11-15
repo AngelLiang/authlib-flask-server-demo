@@ -11,4 +11,4 @@ def register_extensions(app):
     from app.views.admin import init_admin
     db.init_app(app)
     admin.init_app(app)
-    init_admin(admin)
+    init_admin(admin, app=app)

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+  {% if user %}
+    <p>You are {{ user.username }}</p>
+  {% else %}
+    <p>You are not authenticated</p>
+  {% endif %}
+
+  <p>Type any username:</p>
+  <form method="post" action="/">
+    <input type="text" name="username">
+    <input type="submit">
+  </form>
+
+  <hr>
+  {% for client in clients %}
+  <pre>
+  {{ client.client_info|tojson }}
+  {{ client.client_metadata|tojson }}
+  </pre>
+  {% endfor %}
+
+</body>
+</html>
