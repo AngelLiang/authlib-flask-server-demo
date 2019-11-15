@@ -41,6 +41,7 @@ authlib 示例代码
 
 6. 启动 client.py::
 
+    # console 2
     pipenv shell
     python client.py
 
