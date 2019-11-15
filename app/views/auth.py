@@ -20,7 +20,7 @@ def index():
             db.session.add(user)
             db.session.commit()
         session['id'] = user.id
-        return redirect('/')
+        return redirect('/admin')
     user = current_user()
     if user:
         # 获取该帐号的客户端

@@ -16,7 +16,7 @@ class UserModelView(ModelView):
 
 class OAuth2ClientModelView(ModelView):
 
-    # form_columns =  ('user', 'client_name', 'client_uri', 'redirect_uri','grant_type')
+    # form_columns =  ('user', 'client_name', 'client_uri', 'redirect_uri', 'grant_type')
 
     def get_create_form(self):
         return OAuth2ClientForm
