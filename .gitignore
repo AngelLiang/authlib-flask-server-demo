@@ -116,3 +116,5 @@ dmypy.json
 *.db
 bower_components/
 upload/
+*.pem
+
