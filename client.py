@@ -69,17 +69,20 @@ def homepage():
 
 @app.route('/login')
 def login():
+    """登录"""
     redirect_uri = url_for('auth', _external=True)
     current_app.logger.debug(redirect_uri)
-    return oauth.remote.authorize_redirect(redirect_uri)
+    return oauth.remote.authorize_redirect(redirect_uri=redirect_uri)
 
 
 @app.route('/auth')
 def auth():
+    """客户端处理认证"""
+    # 获取 access token
     token = oauth.remote.authorize_access_token()
     user = oauth.remote.parse_id_token(token)
-    current_app.logger.debug(f'user:{user}')
     session['user'] = user
+    current_app.logger.debug(f'user:{user}')
     current_app.logger.debug(f'token:{token}')
     if token:
         session['token'] = token
@@ -91,9 +94,7 @@ def me():
     current_app.logger.debug(session)
     if 'token' in session:
         resp = oauth.remote.get('me')
-        if resp.status_code >= 200 and resp.status_code <= 299:
-            return jsonify(resp.json())
-        return resp.text
+        return jsonify(resp.json())
     return redirect('/')
 
 
