@@ -2,12 +2,25 @@
 
 # from flask_admin import BaseView
 from werkzeug.security import gen_salt
+from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 
 from app.extensions import db
 from app.models import User, OAuth2Client, OAuth2Token, OAuth2AuthorizationCode
 from app.forms import OAuth2ClientForm
 from app.views.utils import current_user
+
+
+class HomeView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        user = current_user()
+        if user:
+            # 获取该帐号的客户端
+            clients = OAuth2Client.query.filter_by(user_id=user.id).all()
+        else:
+            clients = []
+        return self.render('admin_index.html', user=user, clients=clients)
 
 
 class UserModelView(ModelView):

@@ -4,7 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 
 db = SQLAlchemy()
-admin = Admin()
+
+from app.views.admin import HomeView  # noqa
+admin = Admin(index_view=HomeView())
 
 
 def register_extensions(app):
