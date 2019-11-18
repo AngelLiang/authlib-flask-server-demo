@@ -3,15 +3,20 @@
   </p>
   
   <form action="" method="post">
-    <label>
+    {# <label>
       <input type="checkbox" name="confirm">
       <span>Consent?</span>
-    </label>
+    </label> #}
     {% if not user %}
     <p>You haven't logged in. Log in with:</p>
     <div>
+      <label id='username'>username:</label>
       <input type="text" name="username">
     </div>
+    <div>
+        <label id='password'>password:</label>
+        <input type="password" name="password">
+      </div>
     {% endif %}
     <br>
     <button>Submit</button>

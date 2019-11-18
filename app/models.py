@@ -26,7 +26,7 @@ class User(BaseModel):
         return self.id
 
     def check_password(self, password):
-        return password == 'valid'
+        return password == 'password'
 
 
 class OAuth2Client(BaseModel, OAuth2ClientMixin):
