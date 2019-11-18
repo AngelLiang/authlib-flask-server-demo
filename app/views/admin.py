@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import time
 # from flask_admin import BaseView
 from werkzeug.security import gen_salt
 from flask_admin import AdminIndexView, expose
@@ -7,7 +8,7 @@ from flask_admin.contrib.sqla import ModelView
 
 from app.extensions import db
 from app.models import User, OAuth2Client, OAuth2Token, OAuth2AuthorizationCode
-from app.forms import OAuth2ClientForm
+from app.forms import OAuth2ClientForm, OAuth2ClientForm2
 from app.views.utils import current_user
 
 
@@ -29,10 +30,17 @@ class UserModelView(ModelView):
 
 class OAuth2ClientModelView(ModelView):
 
-    # form_columns =  ('user', 'client_name', 'client_uri', 'redirect_uri', 'grant_type')
+    # form_rules = ['user', 'client_id', 'client_secret',
+    #                    'client_id_issued_at', 'client_secret_expires_at',
+    #                    'client_metadata']
 
     def get_create_form(self):
-        return OAuth2ClientForm
+        # return OAuth2ClientForm
+        return OAuth2ClientForm2
+
+    def get_edit_form(self):
+        # return OAuth2ClientForm
+        return OAuth2ClientForm2
 
     def on_model_change(self, form, model, is_created):
         if is_created:
@@ -41,6 +49,9 @@ class OAuth2ClientModelView(ModelView):
                 model.client_secret = ''
             else:
                 model.client_secret = gen_salt(48)
+            if hasattr(model, 'client_id_issued_at'):
+                model.client_id_issued_at = int(time.time())
+
             user = current_user()
             if user:
                 model.user_id = user.id
@@ -55,7 +66,7 @@ class OAuth2AuthorizationCodeModelView(ModelView):
 
 
 def init_admin(admin, app=None):
-    admin.add_view(OAuth2ClientModelView(
+    admin.add_view(UserModelView(
         User, db.session, name='User'))
     admin.add_view(OAuth2ClientModelView(
         OAuth2Client, db.session, name='OAuth2Client'))

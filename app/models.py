@@ -1,7 +1,8 @@
 # coding=utf-8
 
 import time
-from authlib.flask.oauth2.sqla import (
+from sqlalchemy.ext.hybrid import hybrid_property
+from authlib.integrations.sqla_oauth2 import (
     OAuth2ClientMixin, OAuth2AuthorizationCodeMixin, OAuth2TokenMixin
 )
 
@@ -36,6 +37,13 @@ class OAuth2Client(BaseModel, OAuth2ClientMixin):
     user_id = db.Column(
         db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
     user = db.relationship('User')
+
+    # @hybrid_property
+    # def client_metadata(self):
+    #     from authlib.common.encoding import json_loads
+    #     if hasattr(self, '_client_metadata') and self._client_metadata:
+    #         return json_loads(self._client_metadata)
+    #     return {}
 
 
 class OAuth2Token(BaseModel, OAuth2TokenMixin):

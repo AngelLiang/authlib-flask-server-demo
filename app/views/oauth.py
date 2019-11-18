@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from flask import Blueprint, session, jsonify, request, render_template, current_app, redirect
-from authlib.flask.oauth2 import current_token
+from authlib.integrations.flask_oauth2 import current_token
 from authlib.oauth2 import OAuth2Error
 
 from app.models import User
