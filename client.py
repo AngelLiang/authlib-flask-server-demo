@@ -4,11 +4,12 @@ from flask import Flask, url_for, session, current_app, jsonify
 from flask import redirect, render_template_string
 from authlib.integrations.flask_client import OAuth
 from authlib.specs.rfc6749 import OAuth2Token
+from authlib.integrations._client import OAuthError
 
 from dotenv import load_dotenv
 if os.path.exists('.env'):
     load_dotenv('.env', override=True)
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
+
 
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
@@ -78,8 +79,13 @@ def login():
 @app.route('/auth')
 def auth():
     """客户端处理认证"""
-    # 获取 access token
-    token = oauth.remote.authorize_access_token()
+    try:
+        # 获取 access token
+        # code只能使用一次
+        token = oauth.remote.authorize_access_token()
+    except OAuthError as e:
+        current_app.logger.info(e)
+        return {'error': e.error, 'description': e.description}
     user = oauth.remote.parse_id_token(token)
     session['user'] = user
     current_app.logger.debug(f'user:{user}')
