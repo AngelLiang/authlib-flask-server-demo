@@ -24,6 +24,10 @@ class User(BaseModel):
         return self.username
 
     def get_user_id(self):
+        """For authlib
+
+        User模型需要实现该方法
+        """
         return self.id
 
     def check_password(self, password):
