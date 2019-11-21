@@ -43,7 +43,7 @@ authlib 示例代码
 
     # console 2
     pipenv shell
-    python client.py
+    python client/client.py
 
 
 7. 访问 http://127.0.0.1:8000/ ，然后 login
