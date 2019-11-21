@@ -1,9 +1,11 @@
 # coding=utf-8
 
 import time
-# from flask_admin import BaseView
 from werkzeug.security import gen_salt
+from flask import redirect, session
+# from flask_admin import BaseView
 from flask_admin import AdminIndexView, expose
+from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 
 from app.extensions import db
@@ -13,9 +15,12 @@ from app.views.utils import current_user
 
 
 class HomeView(AdminIndexView):
-    @expose('/')
+    @expose('/', methods=['GET', 'POST'])
     def index(self):
+        print(session)
         user = current_user()
+        if user is None:
+            return redirect('/')
         if user:
             # 获取该帐号的客户端
             clients = OAuth2Client.query.filter_by(user_id=user.id).all()
@@ -56,12 +61,11 @@ class OAuth2ClientModelView(ModelView):
             if user:
                 model.user_id = user.id
 
-
-class OAuth2TokenModelView(ModelView):
+class OAuth2AuthorizationCodeModelView(ModelView):
     pass
 
 
-class OAuth2AuthorizationCodeModelView(ModelView):
+class OAuth2TokenModelView(ModelView):
     pass
 
 
@@ -70,7 +74,9 @@ def init_admin(admin, app=None):
         User, db.session, name='User'))
     admin.add_view(OAuth2ClientModelView(
         OAuth2Client, db.session, name='OAuth2Client'))
-    admin.add_view(OAuth2TokenModelView(
-        OAuth2Token, db.session, name='OAuth2Token'))
     admin.add_view(OAuth2AuthorizationCodeModelView(
         OAuth2AuthorizationCode, db.session, name='OAuth2AuthorizationCode'))
+    admin.add_view(OAuth2TokenModelView(
+        OAuth2Token, db.session, name='OAuth2Token'))
+
+    admin.add_link(MenuLink('logout', '/logout'))

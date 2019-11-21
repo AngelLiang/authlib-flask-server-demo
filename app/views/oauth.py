@@ -6,7 +6,7 @@ from authlib.oauth2 import OAuth2Error
 
 from app.models import User
 from app.oauth2 import authorization, require_oauth
-from app.views.utils import current_user
+from app.views.utils import current_user, login_user
 
 
 oauth_bp = Blueprint(__name__, 'oauth_bp')
@@ -15,38 +15,28 @@ oauth_bp = Blueprint(__name__, 'oauth_bp')
 @oauth_bp.route('/oauth/authorize', methods=['GET', 'POST'])
 def authorize():
     """"认证页面"""
+    print(session)
     user = current_user()
+
     if request.method == 'GET':
         try:
             grant = authorization.validate_consent_request(end_user=user)
         except OAuth2Error as error:
             current_app.logger.debug(error)
             return error.error
-        current_app.logger.debug(f'user:{user}')
-        current_app.logger.debug(f'grant:{grant}')
+        # return authorization.create_authorization_response(grant_user=user)
         return render_template('authorize.html', user=user, grant=grant)
-
-    # POST
-    if not user:
+    if request.method == 'POST' and user is None:
         username = request.form.get('username')
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
         if user is None or not user.check_password(password):
             return redirect(request.url)
+        login_user(user)
 
     grant_user = user
 
     return authorization.create_authorization_response(grant_user=grant_user)
-
-
-# @oauth_bp.route('/oauth/login', methods=['GET', 'POST'])
-# def login():
-#     """"登录页面"""
-#     if request.method == 'GET':
-#         return render_template('login.html')
-#     username = request.form.get('username')
-#     password = request.form.get('password')
-#     user = User.query.filter_by(username=username).first()
 
 
 @oauth_bp.route('/oauth/token', methods=['POST'])

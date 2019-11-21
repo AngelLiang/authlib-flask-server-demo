@@ -11,13 +11,13 @@ if os.path.exists('.env'):
     load_dotenv('.env', override=True)
 
 
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+CLIENT_ID = os.getenv('REMOTE2_CLIENT_ID')
+CLIENT_SECRET = os.getenv('REMOTE2_CLIENT_SECRET')
 
 app = Flask(__name__)
 app.secret_key = '!secret'
 app.config.update({
-    'SESSION_COOKIE_NAME': 'client',
+    'SESSION_COOKIE_NAME': 'client2',
 })
 
 
@@ -116,4 +116,4 @@ def profile():
 
 if __name__ == "__main__":
     oauth.init_app(app)
-    app.run(port=8000, debug=True)
+    app.run(port=8001, debug=True)

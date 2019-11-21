@@ -9,3 +9,10 @@ def current_user():
         uid = session['id']
         return User.query.get(uid)
     return None
+
+
+def login_user(user):
+    session['id'] = user.id
+
+def logout_user():
+    session['id'] = None

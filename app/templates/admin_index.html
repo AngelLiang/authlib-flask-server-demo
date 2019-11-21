@@ -5,13 +5,14 @@
     <p>You are {{ user.username }}</p>
   {% else %}
     <p>You are not authenticated</p>
-  {% endif %}
-
-  <p>Type any username:</p>
+  
+    <p>Type any username:</p>
   <form method="post" action="/">
     <input type="text" name="username">
     <input type="submit">
   </form>
+  
+  {% endif %}
 
   <hr>
   {% for client in clients %}

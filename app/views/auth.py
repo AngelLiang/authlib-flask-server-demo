@@ -4,7 +4,7 @@ from flask import Blueprint, session, request, render_template, redirect
 
 from app.extensions import db
 from app.models import User, OAuth2Client
-from app.views.utils import current_user
+from app.views.utils import current_user, login_user,logout_user
 
 auth_bp = Blueprint(__name__, 'auth_bp')
 
@@ -19,7 +19,7 @@ def index():
             user = User(username=username)
             db.session.add(user)
             db.session.commit()
-        session['id'] = user.id
+        login_user(user)
         return redirect('/admin')
     user = current_user()
     if user:
@@ -27,4 +27,11 @@ def index():
         clients = OAuth2Client.query.filter_by(user_id=user.id).all()
     else:
         clients = []
+    print(session)
     return render_template('home.html', user=user, clients=clients)
+
+
+@auth_bp.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    return redirect('/')
