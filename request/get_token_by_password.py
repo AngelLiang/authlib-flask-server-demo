@@ -25,7 +25,7 @@ url = f'http://127.0.0.1:{PORT}/oauth/token'
 
 # 申请token
 """
-    POST /revoke HTTP/1.1
+    POST /oauth/token HTTP/1.1
     Content-Type: application/x-www-form-urlencoded
     Authorization: Basic <client_id:client_secret>
 
