@@ -43,7 +43,14 @@ def authorize():
 def issue_token():
     """发布token
 
-    http://127.0.0.1:5000/oauth/token
+        ::
+
+            POST /oauth/token HTTP/1.1
+            Content-Type: application/x-www-form-urlencoded
+            Authorization: Basic <client_id:client_secret>
+
+            grant_type=password&username=username&password=password&scope=profile
+
     """
     return authorization.create_token_response()
 
@@ -52,7 +59,14 @@ def issue_token():
 def revoke_token():
     """撤销token
 
-    http://127.0.0.1:5000/oauth/revoke
+    ::
+
+        POST /oauth/revoke HTTP/1.1
+        Content-Type: application/x-www-form-urlencoded
+        Authorization: Basic <client_id:client_secret>
+
+        token=45ghiukldjahdnhzdauz&token_type_hint=refresh_token
+
     """
     return authorization.create_endpoint_response('revocation')
 
