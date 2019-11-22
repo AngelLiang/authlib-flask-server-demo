@@ -11,9 +11,6 @@ if os.path.exists('.env'):
     load_dotenv('.env', override=True)
 
 
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-
 app = Flask(__name__)
 app.secret_key = '!secret'
 app.config.update({
@@ -26,13 +23,16 @@ def fetch_token(name):
 
 
 oauth = OAuth(fetch_token=fetch_token)
-oauth.register(
+remote = oauth.register(
     name='remote',
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
+    client_id=os.getenv('CLIENT_ID'),
+    client_secret=os.getenv('CLIENT_SECRET'),
     request_token_url=None,
+    request_token_params=None,
     access_token_url='http://127.0.0.1:5000/oauth/token',
     access_token_params=None,
+    refresh_token_url=None,
+    refresh_token_params=None,
     authorize_url='http://127.0.0.1:5000/oauth/authorize',
     authorize_params=None,
     api_base_url='http://127.0.0.1:5000/api/',  # 资源服务器url
@@ -64,9 +64,10 @@ def homepage():
 def login():
     """登录"""
     current_app.logger.debug(session)
-    redirect_uri = url_for('auth', _external=True)
+    redirect_uri = url_for('oauth_authorize_callback', _external=True)
     current_app.logger.debug(redirect_uri)
-    return oauth.remote.authorize_redirect(redirect_uri=redirect_uri)
+    # return oauth.remote.authorize_redirect(redirect_uri=redirect_uri)
+    return remote.authorize_redirect(redirect_uri=redirect_uri)
 
 
 @app.route('/logout')
@@ -77,16 +78,20 @@ def logout():
 
 
 @app.route('/auth')
-def auth():
+def oauth_authorize_callback():
     """客户端处理认证"""
     try:
         # 获取 access token
         # code只能使用一次
-        token = oauth.remote.authorize_access_token()
+        # token = oauth.remote.authorize_access_token()
+        token = remote.authorize_access_token()
     except OAuthError as e:
         current_app.logger.info(e)
         return {'error': e.error, 'description': e.description}
-    user = oauth.remote.parse_id_token(token)
+    # user = oauth.remote.parse_id_token(token)
+    user = remote.parse_id_token(token)
+    # TODO:
+
     session['user'] = user
     current_app.logger.debug(f'user:{user}')
     current_app.logger.debug(f'token:{token}')
@@ -100,7 +105,8 @@ def auth():
 def me():
     current_app.logger.debug(session)
     if 'token' in session:
-        resp = oauth.remote.get('me')
+        # resp = oauth.remote.get('me')
+        resp = remote.get('me')
         return jsonify(resp.json())
     return redirect('/')
 
@@ -109,7 +115,8 @@ def me():
 def profile():
     current_app.logger.debug(session)
     if 'token' in session:
-        resp = oauth.remote.get('profile')
+        # resp = oauth.remote.get('profile')
+        resp = remote.get('profile')
         return jsonify(resp.json())
     return redirect('/')
 

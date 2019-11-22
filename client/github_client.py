@@ -13,8 +13,6 @@ if os.path.exists('.env'):
     load_dotenv('.env', override=True)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
 
-CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
-CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 
 TOKEN_KEY = 'github_token'
 
@@ -27,17 +25,20 @@ def fetch_token(name):
 
 
 oauth = OAuth(app, fetch_token=fetch_token)
-oauth.register(
+github = oauth.register(
     name='github',
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
+    client_id=os.getenv('GITHUB_CLIENT_ID'),
+    client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
     request_token_url=None,
+    request_token_params=None,
     access_token_url='https://github.com/login/oauth/access_token',
     access_token_params=None,
+    refresh_token_url=None,
+    refresh_token_params=None,
     authorize_url='https://github.com/login/oauth/authorize',
     authorize_params=None,
     api_base_url='https://api.github.com/resource',  # 资源服务器url
-    client_kwargs={'scope': 'email'},
+    client_kwargs={'scope': 'user'},
 )
 
 home = """
@@ -63,14 +64,14 @@ def homepage():
 @app.route('/login')
 def login():
     """登录"""
-    redirect_uri = url_for('auth', _external=True)
+    redirect_uri = url_for('oauth_authorize_callback', _external=True)
     current_app.logger.debug(redirect_uri)
     return oauth.github.authorize_redirect(redirect_uri=redirect_uri)
 
 
 @app.route('/auth')
-def auth():
-    """客户端处理认证"""
+def oauth_authorize_callback():
+    """客户端处理认证回调URL"""
     # 获取 access token
     token = oauth.github.authorize_access_token()
     user = oauth.github.parse_id_token(token)
@@ -87,6 +88,15 @@ def profile():
     current_app.logger.debug(session)
     if TOKEN_KEY in session:
         resp = oauth.github.get('/user/profile')
+        return jsonify(resp.json())
+    return redirect('/')
+
+
+@app.route('/user')
+def user():
+    current_app.logger.debug(session)
+    if TOKEN_KEY in session:
+        resp = oauth.github.get('/user')
         return jsonify(resp.json())
     return redirect('/')
 
