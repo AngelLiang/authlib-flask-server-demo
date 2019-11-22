@@ -8,7 +8,7 @@
       <span>Consent?</span>
     </label> #}
     {% if user %}
-      {{ user | safe }}
+      current_user: {{ user | safe }}
     {% else %}
     <p>You haven't logged in. Log in with:</p>
     <div>
